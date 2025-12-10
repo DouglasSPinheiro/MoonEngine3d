@@ -23,29 +23,23 @@ on:
         default: 'development'
 jobs:
   build:
-
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v4
-    - name: Decrpypt PFX file
+    - name: Setup Keystore File
       run: |
-        echo "${{secrets.WINDOWS_PFX_CERT}}" > cert.pfx.asc
-        certutil -decode cert.pfx.asc cert.pfx
-    - name:  Add cert to Store
-      run: certutil -user -q -p ${{secrets.WINDOWS_PFX_PASSWORD}} -importpfx cert.pfx NoRoot
+        echo "${{secrets.KEYSTORE_FILE}}" > myapp.keystore.asc
+        gpg -d --passphrase "${{secrets.KEYSTORE_PASSWORD_GPG}}" --batch myapp.keystore.asc > myapp.keystore
+        
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
-      with: 
+      with:
         dotnet-version: 9.0.x
     - name: Install .NET MAUI
       run: dotnet workload install maui
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet dotnet build MoonEngine3d.csproj -c Release -f:net9.0-windows10.0.19041.0 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint="${{secrets.WINDOWS_PFX_THUMBPRINT}}"
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v5.0.0
-      with:
-        path: .\**\AppPackages\**\*.*
-        
+    #  run: dotnet dotnet build MoonEngine3d.csproj -c Release -f:net9.0-windows10.0.19041.0/p:AndroidSigningKeyStore=myapp.keystore /p:AndroidSigningKeyAlias=ghactionskey /p:AndroidSigningKeyPass="${{ secrets.KEYSTORE_PASSWORD }}" /p:AndroidSigningStorePass="${{ secrets.KEYSTORE_PASSWORD_ALIAS }}" --no-restore
+    Release -f:net6.0-windows10.0.19041.0 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint="${{ secrets.WINDOWS_PFX_THUMBPRINT }}"      
+    
