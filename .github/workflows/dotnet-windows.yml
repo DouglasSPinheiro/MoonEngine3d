@@ -31,7 +31,7 @@ jobs:
     - name: Decrpypt PFX file
       run: |
         echo "${{secrets.WINDOWS_PFX_CERT}}" > cert.pfx.asc
-        certutil -decode ceert.pfx.asc cert.pfx
+        certutil -decode cert.pfx.asc cert.pfx
     - name:  Add cert to Store
       run: certuil -user -q -p ${{secrets.WINDOWS_PFX_PASSWORD}} -importpfx cert.pfx NoRoot
     - name: Setup .NET
