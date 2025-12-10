@@ -31,7 +31,8 @@ jobs:
     - name: Setup Keystore File
       run: |
         echo "${{secrets.KEYSTORE_FILE}}" > myapp.keystore.asc
-        gpg -d --passphrase "${{secrets.KEYSTORE_PASSWORD_GPD}}" --batch myapp.keystore.asc > myapp.keystore
+        gpg -d --passphrase "${{secrets.KEYSTORE_PASSWORD_GPG}}" --batch myapp.keystore.asc > myapp.keystore
+        
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -41,5 +42,5 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build MoonEngine3d.csproj -c Release -f:net9.0-windows10.0.19041.0 /p:WindowsSigningStorePass=$"{{}secrets.KEYSTORE_PASSWORD_ALIAS}"
-    
+      run: dotnet dotnet build MoonEngine3d.csproj -c Release -f:net9.0-windows10.0.19041.0/p:AndroidSigningKeyStore=myapp.keystore /p:AndroidSigningKeyAlias=ghactionskey /p:AndroidSigningKeyPass="${{ secrets.KEYSTORE_PASSWORD }}" /p:AndroidSigningStorePass="${{ secrets.KEYSTORE_PASSWORD_ALIAS }}" --no-restore
+   
