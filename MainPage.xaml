@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MoonEngine3d.MainPage"
+             xmlns:local ="clr-namespace:MoonEngine3d"
+             x:DataType="{x:Type local:MainPage}"
+             x:Name="this"
+             >
+
+    <ScrollView>
+        <Grid ColumnDefinitions="*" RowDefinitions="*">
+            <GraphicsView Background="Black"
+                  x:Name="canva"
+                  
+                  Drawable="{Binding Source={x:Reference this}}"/>
+        </Grid>
+    </ScrollView>
+
+</ContentPage>
