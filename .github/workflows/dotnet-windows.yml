@@ -28,11 +28,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup Keystore File
+    - name: Decrpypt PFX file
       run: |
-        echo "${{secrets.KEYSTORE_FILE}}" > myapp.keystore.asc
-        gpg -d --passphrase "${{secrets.KEYSTORE_PASSWORD_GPG}}" --batch myapp.keystore.asc > myapp.keystore
-        
+        echo "${{secrets.WINDOWS_PFX_CERT}}" > cert.pfx.asc
+        certultil -decode ceert.pfx.asc cert.pfx
+    - name:  Add cert to Store
+      run: certuil -user -q -p ${{secrets.WINDOWS_PFX+PASSWORD}} -importpfx ceert.pfx NoRoot
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -42,5 +43,11 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet dotnet build MoonEngine3d.csproj -c Release -f:net9.0-windows10.0.19041.0/p:AndroidSigningKeyStore=myapp.keystore /p:AndroidSigningKeyAlias=ghactionskey /p:AndroidSigningKeyPass="${{ secrets.KEYSTORE_PASSWORD }}" /p:AndroidSigningStorePass="${{ secrets.KEYSTORE_PASSWORD_ALIAS }}" --no-restore
-   
+      run: dotnet dotnet build MoonEngine3d.csproj -c Release -f:net9.0-windows10.0.19041.0 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint="${{secrets.WINDOWS_PFX_THUMBPRINT}}"
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v5.0.0
+      with:
+        # Artifact name
+        name: WindowsBuild
+        # A file, directory or wildcard pattern that describes what to upload
+        
